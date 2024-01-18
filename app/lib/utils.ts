@@ -1,3 +1,4 @@
+import { ReadonlyURLSearchParams } from 'next/navigation';
 import { Revenue } from './definitions';
 
 export const formatCurrency = (amount: number) => {
@@ -66,4 +67,28 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
     '...',
     totalPages,
   ];
+};
+
+export const getPathWithQueryParams = ({
+  pathName,
+  searchParams,
+  queryParams,
+}: {
+  pathName: string;
+  searchParams: ReadonlyURLSearchParams;
+  queryParams: Record<string, string | number>;
+}) => {
+  const params = new URLSearchParams(searchParams);
+
+  for (const key in queryParams) {
+    if (queryParams[key]) {
+      params.set(key.toString(), queryParams[key].toString());
+    } else {
+      params.delete(key.toString());
+    }
+  }
+
+  const newPath = `${pathName}?${params.toString()}`;
+
+  return { path: newPath };
 };
