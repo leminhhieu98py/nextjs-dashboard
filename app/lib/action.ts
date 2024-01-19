@@ -20,8 +20,7 @@ const FormSchema = z.object({
   date: z.string(),
 });
 
-const CreateInvoice = FormSchema.omit({ id: true, date: true });
-const EditInvoice = FormSchema.omit({ date: true });
+const InvoiceSchema = FormSchema.omit({ id: true, date: true });
 
 export type State = {
   errors?: {
@@ -35,7 +34,7 @@ export type State = {
 export async function createInvoice(prevState: State, formData: FormData) {
   try {
     const rawFormData = getRawFormData(formData);
-    const validatedFields = CreateInvoice.safeParse(rawFormData);
+    const validatedFields = InvoiceSchema.safeParse(rawFormData);
 
     if (!validatedFields.success) {
       return {
@@ -60,10 +59,14 @@ export async function createInvoice(prevState: State, formData: FormData) {
   redirect('/dashboard/invoices');
 }
 
-export async function updateInvoice(prevState: State, formData: FormData) {
+export async function updateInvoice(
+  id: string,
+  prevState: State,
+  formData: FormData,
+) {
   try {
     const rawFormData = getRawFormData(formData);
-    const validatedFields = EditInvoice.safeParse(rawFormData);
+    const validatedFields = InvoiceSchema.safeParse(rawFormData);
 
     if (!validatedFields.success) {
       return {
@@ -72,7 +75,7 @@ export async function updateInvoice(prevState: State, formData: FormData) {
       };
     }
 
-    const { customerId, amount, status, id } = validatedFields.data;
+    const { customerId, amount, status } = validatedFields.data;
 
     const amountInCents = amount * 100;
 
