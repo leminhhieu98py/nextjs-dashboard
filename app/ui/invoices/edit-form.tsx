@@ -9,6 +9,7 @@ import {
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { Button } from '@/app/ui/button';
+import { updateInvoice } from '@/app/lib/action';
 
 export default function EditInvoiceForm({
   invoice,
@@ -18,8 +19,9 @@ export default function EditInvoiceForm({
   customers: CustomerField[];
 }) {
   return (
-    <form>
+    <form action={updateInvoice}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
+        <input type="text" name="id" hidden value={invoice.id} />
         {/* Customer Name */}
         <div className="mb-4">
           <label htmlFor="customer" className="mb-2 block text-sm font-medium">

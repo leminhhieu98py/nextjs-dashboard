@@ -92,3 +92,6 @@ export const getPathWithQueryParams = ({
 
   return { path: newPath };
 };
+
+export const getRawFormData = (formData: FormData) =>
+  Object.fromEntries(formData.entries());
