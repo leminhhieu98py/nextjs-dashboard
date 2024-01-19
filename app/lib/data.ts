@@ -24,7 +24,7 @@ export async function fetchRevenue() {
   // This is equivalent to in fetch(..., {cache: 'no-store'}).
   noStore();
 
-  await delay(5);
+  // await delay(5);
 
   try {
     // Artificially delay a response for demo purposes.
@@ -47,7 +47,7 @@ export async function fetchRevenue() {
 export async function fetchLatestInvoices() {
   noStore();
 
-  await delay(3);
+  // await delay(3);
 
   try {
     const data = await sql<LatestInvoiceRaw>`
