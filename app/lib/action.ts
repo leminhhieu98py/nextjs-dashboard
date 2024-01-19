@@ -9,20 +9,42 @@ import { redirect } from 'next/navigation';
 
 const FormSchema = z.object({
   id: z.string(),
-  customerId: z.string(),
-  amount: z.coerce.number(),
-  status: z.enum(['pending', 'paid']),
+  customerId: z.string({ required_error: 'Please choose a customer' }),
+  amount: z.coerce
+    .number({ required_error: 'Please enter an amount' })
+    .gt(0, { message: 'Please enter an amount greater than $0.' }),
+  status: z.enum(['pending', 'paid'], {
+    required_error: 'Please select an invoice status.',
+    invalid_type_error: 'Please select an invoice status.',
+  }),
   date: z.string(),
 });
 
 const CreateInvoice = FormSchema.omit({ id: true, date: true });
 const EditInvoice = FormSchema.omit({ date: true });
 
-export async function createInvoice(formData: FormData) {
+export type State = {
+  errors?: {
+    customerId?: string[];
+    amount?: string[];
+    status?: string[];
+  };
+  message?: string | null;
+};
+
+export async function createInvoice(prevState: State, formData: FormData) {
   try {
     const rawFormData = getRawFormData(formData);
-    const { customerId, amount, status } = CreateInvoice.parse(rawFormData);
+    const validatedFields = CreateInvoice.safeParse(rawFormData);
 
+    if (!validatedFields.success) {
+      return {
+        errors: validatedFields.error.flatten().fieldErrors,
+        message: 'Missing Fields. Failed to Create Invoice.',
+      };
+    }
+
+    const { customerId, amount, status } = validatedFields.data;
     const amountInCents = amount * 100;
     const date = new Date().toISOString().split('T')[0];
 
@@ -38,10 +60,19 @@ export async function createInvoice(formData: FormData) {
   redirect('/dashboard/invoices');
 }
 
-export async function updateInvoice(formData: FormData) {
+export async function updateInvoice(prevState: State, formData: FormData) {
   try {
     const rawFormData = getRawFormData(formData);
-    const { customerId, amount, status, id } = EditInvoice.parse(rawFormData);
+    const validatedFields = EditInvoice.safeParse(rawFormData);
+
+    if (!validatedFields.success) {
+      return {
+        errors: validatedFields.error.flatten().fieldErrors,
+        message: 'Missing Fields. Failed to Create Invoice.',
+      };
+    }
+
+    const { customerId, amount, status, id } = validatedFields.data;
 
     const amountInCents = amount * 100;
 
